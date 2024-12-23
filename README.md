@@ -12,6 +12,10 @@ Internally uses syslog.h
  - use tagging
  - copy entry to std::cout/std::cerr/std::clog
 
+Features are activated using either subscript [] operators or << operators.
+All features work with both, except tag name which only works with subscript []
+operator.
+
 ### <sub>Log levels</sub>
 
  - EMERG
@@ -70,5 +74,5 @@ where all object files will be built.
 
 ## <sub>Example</sub>
 
-Minimal sample code is provided, it does not currently introduce all features, just
-minimal functionality is provided. 
+Sample code demonstrating features is provided. Needs to be executed with user id
+who is allowed to write to syslog (no read permission needed).

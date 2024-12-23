@@ -132,6 +132,16 @@ syslog::logger& syslog::logger::operator [](const std::string& name) {
 	return *this;
 }
 
+syslog::logger& syslog::logger::operator [](const std::ostream* c) {
+
+	if ( c == &std::cout ) this -> _copy = syslog::COUT;
+	else if ( c == &std::cerr ) this -> _copy = syslog::CERR;
+	else if ( c == &std::clog ) this -> _copy = syslog::CLOG;
+	else this -> _copy = syslog::NONE;
+
+	return *this;
+}
+
 syslog::logger& syslog::logger::operator [](const syslog::COPY& copy_to) {
 	this -> _copy = copy_to;
 	return *this;

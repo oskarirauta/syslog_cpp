@@ -44,6 +44,7 @@ namespace syslog {
 
 			logger& operator =(const std::nullptr_t& n);
 			logger& operator [](const std::string& name);
+			logger& operator [](const std::ostream* c);
 			logger& operator [](const syslog::COPY& copy_to);
 			logger& operator [](const syslog::FACILITY& facility);
 
