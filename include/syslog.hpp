@@ -29,6 +29,7 @@ namespace syslog {
 			COPY _copy = syslog::COPY::NONE;
 			FACILITY _fac = syslog::FACILITY::USER;
 			std::string _name;
+			bool _enabled;
 			void print_copy();
 
 		protected:
@@ -39,21 +40,24 @@ namespace syslog {
 		public:
 
 			void erase();
-			size_t size();
-			bool empty();
+			size_t size() const;
+			bool empty() const;
+			bool enabled() const;
 
+			operator bool() const;
+			logger& operator =(const bool& enabled);
 			logger& operator =(const std::nullptr_t& n);
 			logger& operator [](const std::string& name);
-			logger& operator [](const std::ostream* c);
+			logger& operator [](const char* name);
 			logger& operator [](const syslog::COPY& copy_to);
 			logger& operator [](const syslog::FACILITY& facility);
 
-			logger& operator <<(const std::ostream* c);
 			logger& operator <<(const syslog::COPY& copy_to);
 			logger& operator <<(const syslog::FACILITY& facility);
 			logger& operator <<(const std::nullptr_t& n);
 
-			logger(const syslog::PRI& pri) : std::ostream(this), _pri(pri) {}
+			logger(const syslog::PRI& pri) : std::ostream(this), _pri(pri), _enabled(true) {}
+			logger(const syslog::PRI& pri, bool enabled) : std::ostream(this), _pri(pri), _enabled(enabled) {}
 
 			friend std::ostream& operator <<(std::ostream& os, const logger& l);
 	};

@@ -12,7 +12,7 @@ syslog::logger syslog::error(syslog::PRI::ERROR);
 syslog::logger syslog::warning(syslog::PRI::WARNING);
 syslog::logger syslog::notice(syslog::PRI::NOTICE);
 syslog::logger syslog::info(syslog::PRI::INFO);
-syslog::logger syslog::debug(syslog::PRI::DEBUG);
+syslog::logger syslog::debug(syslog::PRI::DEBUG, false);
 
 static int priority_to_int(const syslog::PRI& pri) {
 
@@ -56,6 +56,11 @@ static int facility_to_int(const syslog::FACILITY& fac) {
 int syslog::logger::sync() {
 
 	if ( !this -> _buf.empty()) {
+
+		if ( !this -> _enabled ) {
+			this -> erase();
+			return 0;
+		}
 
 		if ( this -> _copy != syslog::COPY::NONE )
 			this -> print_copy();
@@ -106,14 +111,30 @@ void syslog::logger::erase() {
 	this -> _fac = syslog::FACILITY::USER;
 }
 
-size_t syslog::logger::size() {
+size_t syslog::logger::size() const {
 
 	return this -> _buf.size();
 }
 
-bool syslog::logger::empty() {
+bool syslog::logger::empty() const {
 
 	return this -> _buf.empty();
+}
+
+bool syslog::logger::enabled() const {
+
+	return this -> _enabled;
+}
+
+syslog::logger::operator bool() const {
+
+	return this -> _enabled;
+}
+
+syslog::logger& syslog::logger::operator =(const bool& enabled) {
+
+	this -> _enabled = enabled;
+	return *this;
 }
 
 syslog::logger& syslog::logger::operator =(const std::nullptr_t& n) {
@@ -132,12 +153,13 @@ syslog::logger& syslog::logger::operator [](const std::string& name) {
 	return *this;
 }
 
-syslog::logger& syslog::logger::operator [](const std::ostream* c) {
+syslog::logger& syslog::logger::operator [](const char* name) {
 
-	if ( c == &std::cout ) this -> _copy = syslog::COUT;
-	else if ( c == &std::cerr ) this -> _copy = syslog::CERR;
-	else if ( c == &std::clog ) this -> _copy = syslog::CLOG;
-	else this -> _copy = syslog::NONE;
+	std::string s(name);
+
+	if ( s.empty())
+		this -> _name.erase();
+	else this -> _name = s;
 
 	return *this;
 }
@@ -149,16 +171,6 @@ syslog::logger& syslog::logger::operator [](const syslog::COPY& copy_to) {
 
 syslog::logger& syslog::logger::operator [](const syslog::FACILITY& facility) {
 	this -> _fac = facility;
-	return *this;
-}
-
-syslog::logger& syslog::logger::operator <<(const std::ostream* c) {
-
-	if ( c == &std::cout ) this -> _copy = syslog::COUT;
-	else if ( c == &std::cerr ) this -> _copy = syslog::CERR;
-	else if ( c == &std::clog ) this -> _copy = syslog::CLOG;
-	else this -> _copy = syslog::NONE;
-
 	return *this;
 }
 
